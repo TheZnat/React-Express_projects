@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="icon" href="favicon.ico" type="image/ico">
+    <title>webpack</title>
+</head>
+<body>
+<div class="root">
+    <div class="logo"></div>
+    <h1>Настройка webpack</h1>
+    <ol>
+        <li>Инициализируем проект: <code>npm init</code></li>
+        <li>Установка веб webpack, через комнаду в терменале: <code>npm install -D webpack webpack-cli</code></li>
+        <li>Создание начальной архтектуры react пиложения: создание деректории src и в ней index.html, index.jsx и тд</li>
+        <li>Создание внутри деректории проекта конфигурационный фалй: webpack.config.js</li>
+        <li>Устанавливаем лоадеры для обработки css и работы с файлами MiniCssExtractPlugin.loader, css-loader:</li>
+        <code>npm install -D style-loader css-loader file-loader </br></code>
+        <code>npm install -D mini-css-extract-plugin</code>
+        <li>Конйигурация webpack.config.js</li>
+        <code><pre>
+    module.exports ={
+    context: path.resolve(__dirname, 'src'), <i>// необязательный параметр (чтобы webpack знал с какой папкой
+     // рабоать и тогда в других
+    // настройках уже отталкиваемся от этой папки), если же не указываем этот параметр, то указываем все пути в config,
+    //отталкиваясь от самого расположения webpack.config.js</i>
+    mode: 'development', <i>// под что собирать (разработка или продакшен)</i>
+    entry: { <i>/ откуда брать файлы js</i>
+          main: './index.jsx'
+    },
+    output: { <i>// где будет лежать исходная сберка от webpack</i>
+            filename: "[name].[contenthash].js", <i>// именование js файлов через шаблоны,
+                                                    //чтобы было удобнее хранить и файлы не путались</i>
+            path: path.resolve(__dirname, 'dist'), <i>// куда класть собранные webpack файлы прокета</i>
+            clean: true, <i>// отчистка старых ферсий файлов, чтобы не было путаници с файлами</i>
+    },
+    <i>// loader - это возможность для вебка работать с другими типами файла (не только js), например css</i>
+    module: {
+    rules: [ <i>// правило по которому рабоать</i>
+             {
+               test: /\.css$/, <i>// если встречаеться файл типо, записан в виде регулярного выражения</i>
+               use: ['style-loader','css-loader'] <i>//то используем эти loaders, тут важен порядок, так как webpack
+            читает с ПРАВА НА ЛЕВО (ЧЕРз ЖОПУ)</i>
+             }
+            ]
+      }
+    }
+        </pre></code>
+        <li>Настройка плагенов</li>
+        <p>HtmlWebpackPlugin - Упрощает создание HTML-файлов для обслуживания пакетов webpack. Это особенно полезно для
+            пакетов webpack, которые включают хэш в имени файла, который изменяется при каждой компиляции (js). То еесть
+            в новый html файлы будут класться файлы с раширнием js, которые мы указали в webpack.config.js (то есть в
+            нашем index.html теперь не нудо привязывать js файлы, через script. Теперть webpack сам их будет подключать
+            через wenpack.config.js). Вы можете либо позволить плагину генерировать для вас HTML-файл.</p>
+        <code><pre>
+    new HtmlWebpackPlugin({
+    title: "Webpack ", <i>// для изменения тайтла, но webpack может брать и из шаблона если указен параметр template</i>
+    template: "./src/index.html" <i>// путь к главному html фалу, без указания пути webpack будет</i>
+                                 <i> //собирать пустой фалй (так как не будет знать откуда брать внутреености )</i>
+   })
+            </pre></code>
+        <li>Установка webpack dev сервера, нужен чтобы не собирать проект кааждый раз при измение кода, а проект сам обновлялся:
+            настройка devServer:</li>
+            <p>Команда для установки <code>npm instlall -D webpack-dev-server</code></p>
+            <p>В файле webpack.config.js указать порт на котором будет запускатся сервер:</p>
+            <code>
+                devServer: {
+                port: 3000
+                },
+            </code>
+            <p>В файле package.json нужно созать сркпит для запуска сервера:</p>
+            <code>"start": "webpack-dev-server --open" <i>(флаг --open, позволит открывать приложение в браузере, сразу после запуска скрипта)</i></code>
+            <li>Webpack из коробки не читает расширение картинок\фото. Настройки конфига для работы с картинками:</li>
+            <code><pre>
+            {
+            test: /\.(png|jpg|svg|gif)$/,
+            type: 'asset'
+            }
+                </pre>
+            </code>
+            <li>Настройки конфига для работы со шрифтами</li>
+            <code>npm i -D file-loader <i>для работы с раширением</i></code>
+                <code><pre>
+            {
+            test: /\.(ttf|woff|woff2|eot)$/,
+            use: ['file-loader']
+            },
+            </pre></code>
+            <li>Настройки конфига для работы с XML</li>
+            <code><pre>
+            {
+            test: /\.xml$/,
+            use: ['xml-loader']
+            }
+            </pre></code>
+            <li>Подключение Js библеотек</li>
+            <code>npm i -S jquery</code>
+            <i>Импортируем файлы библеотеки в index.jsx </i><code>import * as $ from 'jquery'</code>
+            <li>Оптимизация библеотек. Пример настройки конфига, при котором одна и таже библеотека не будет скачиваться
+            каждый раз, если она используеться в разных файлах js </li>
+            <code><pre>
+            optimization: {
+            splitChunks: {
+            chunks: "all"
+                }
+            },
+            </pre></code>
+        <li>Настройки CopyWebpackPlugin</li>
+        <code>npm i -D copy-webpack-plugin</code>
+        <p>Подключаем в его в конфиге и нстраиваем</p>
+        <code>const CopyWebpackPlugin = require('copy-webpack-plugin')<br>
+            <pre>
+        plugins: [
+        new CopyWebpackPlugin({
+        patterns:[
+               {
+                from: path.resolve(__dirname, 'src/assets/favicon.ico'),<i>// Откуда копировать</i>
+                to: path.resolve(__dirname, 'dist')<i>// Куда вставить </i>
+               }
+            ]
+        })
+            </pre>
+        </code>
+        <li>Оптимизация проекта</li>
+        <p>Оптимизация HTML</p>
+        <p>В тременали прписываем <code>npm i -D cross-env</code></p>
+        <p>В конциге </p>
+        <code><pre>
+        const isDev = process.env.NODE_ENV === 'development'
+        const isProd = !isDev
+
+        new HtmlWebpackPlugin({
+        title: "Webpack ",
+        template: "./index.html",
+        minify: {
+        collapseWhitespace: isProd,
+        }
+        }),
+        </pre></code>
+        <p>в package.json</p>
+        <code><pre>
+        "dev": "cross-env NODE_ENV=development webpack --mode development",
+        "build": "cross-env NODE_ENV=production webpack --mode production",
+        "watch": "cross-env NODE_ENV=development webpack --mode development --watch",
+        "start": "cross-env NODE_ENV=development webpack-dev-server --mode development --open"
+        </pre></code>
+        <li>Оптимизация css</li>
+        <p>В тременали прписываем
+         <code>npm install --save-dev optimize-css-assets-webpack-plugin</code>
+         <code>npm i -D terser-webpack-plugin</code>
+        </p>
+        <p>Конфиге</p>
+        <code><pre>
+        const OptimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin')
+        const TerserWebpackPlugin = require('terser-webpack-plugin')
+
+        const isDev = process.env.NODE_ENV === 'development'
+        const isProd = !isDev
+
+        const optimization = () =>{
+        const config = {
+        splitChunks: {
+            chunks: "all"
+            }
+        }
+        if(isProd){
+        config.minimizer = [
+                new OptimizeCssAssetsWebpackPlugin(),
+                new TerserWebpackPlugin()
+            ]
+        }
+        return config
+        }
+        <i>// в module.exports = { прописываем</i>
+        optimization: optimization(),
+        </pre></code>
+        <p>Оптимизация через функцию это удобно, так как оптимизация при dev сборке нам не нужна</p>
+        <li>Для удобство разработки, чтобы не мучиться с хеш названиями в dev версиях сборки </li>
+        <code>
+            const filename = ext => isDev ? `[name].${ext}` : `[name].[hash].${ext}`
+        </code>
+        <code>
+        output: {
+        filename: filename('js'),
+        path: path.resolve(__dirname, 'dist'),
+        clean: true,
+        },
+        </code>
+        <p>Все то же самое и с css  filename: filename('css'),</p>
+        <li>Базовая настройка babel</li>
+        <p>Babel — это транспилятор, который, в основном, используется для преобразования конструкций, принятых в свежих
+            версиях стандарта ECMAScript, в вид, понятный как современным, так и не самым новым браузерам и другим средам,
+            в которых может выполняться JavaScript. Babel, кроме того, умеет преобразовывать в JavaScript и JSX-код, используя
+        </p>
+        <p>Установка babel</p>
+        <code>npm install --save-dev babel-loader @babel/core</code></br>
+        <code>npm i -D @babel/preset-env</code>
+        <p>В конфиге</p>
+        <code><pre>
+                module: {
+        rules: [
+        {
+        test: /\.m?js$/,
+        exclude: /node_modules/,
+        use: {
+            loader: "babel-loader",
+               options: {
+                   presets: ['@babel/preset-env']
+                        }
+                }
+
+            }
+         }
+        ]
+        </pre></code>
+        <p>В package.json <code>"browserslist": "> 0.25%, not dead",</code></p>
+        <div id="app"></div>
+        <p>Настройка конфига</p>
+        <code><pre>
+        test: /\.jsx$/,
+            exclude: /node_modules/,
+            use: {
+               loader: "babel-loader",
+               options: {
+            presets: ['@babel/preset-env','@babel/preset-react'],
+            plugins: ['@babel/plugin-proposal-class-properties']
+                        }
+                }
+        }
+        </pre></code>
+        <p>Установка
+        <code>npm i -D @babel/preset-react</code></br>
+        <code>npm i react react-dom</code>
+        </p>
+        <p>Создаем файл с расширением jsx</p>
+        <p>В файле не забываем про импорт</p>
+        <code>import React from "react"; </br>
+            import {render} from "react-dom";</code>
+        <li>Eslint</li>
+        <p>установка пакета <code>npm i -D eslint-loader</code></p>
+    </ol>
+</div>
+</body>
+</html>
