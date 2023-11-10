@@ -1,0 +1,74 @@
+.slideStyle{
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.slideStyleWrap{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.leftArrowStyles{
+    position: absolute;
+    top: 50%;
+    left: -90px;
+}
+
+.rightArrowStyles{
+    position: absolute;
+    top: 50%;
+    right: -90px;
+}
+
+.arrowBg{
+    background-color: #df974e;
+    width: 50px;
+    height: 50px;
+    border-radius: 65px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.arrowStyles-right{
+    background-image: url("../../img/arrow.png");
+    width: 28px;
+    height: 28px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    z-index: 1;
+    cursor: pointer;
+    margin-left: 4px;
+}
+
+.arrowStyles-left{
+    transform: rotate(180deg);
+    margin-right: 4px;
+    margin-left: 0;
+}
+
+
+.sliderPhotoBar{
+    display: flex;
+    justify-content: center;
+    margin-top: 35px;
+}
+
+.sliderPhotoBar--item{
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    object-fit: cover;
+    padding: 3px;
+    opacity: 0.5;
+}
+
+.activeItem{
+    opacity: 1;
+    transform: scale(1.09);
+}
